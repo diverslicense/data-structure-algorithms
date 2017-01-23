@@ -12,22 +12,8 @@ type NodeD struct {
 // ListD contains pointers to the head and tail of the list
 type ListD struct {
 	head *NodeD
+	// TODO: implement with tail
 	tail *NodeD
-}
-
-// AddToBottomD adds the node before the tail, at the end of the list
-func (Ld *ListD) AddToBottomD(value int) {
-	new := &NodeD{
-		value: value,
-	}
-	if Ld.tail == nil {
-		Ld.tail = new
-		new.prev = Ld.head
-		Ld.head.next = Ld.tail
-	} else {
-		new.prev = Ld.tail.prev
-		Ld.tail = new
-	}
 }
 
 // AddToTopD adds the node after the head, at the top of the list
@@ -35,29 +21,67 @@ func (Ld *ListD) AddToTopD(value int) {
 	new := &NodeD{
 		value: value,
 	}
-	if Ld.head.next != nil {
-		new.next = Ld.head.next
-		new.prev = Ld.head
+	if Ld.head == nil {
+		Ld.head = new
+	} else {
+		tmp := Ld.head
+		new.next = tmp
+		tmp.prev = new
+		Ld.head = new
 	}
-	Ld.head.next = new
 }
 
-// RemoveFromBottomD removes the node at the end of the list
-func (Ld *ListD) RemoveFromBottomD() {
-	Ld.tail.prev = Ld.tail.prev.prev
-	Ld.tail.prev.next = Ld.tail
+// AddToBottomD adds the node at the end of the list
+func (Ld *ListD) AddToBottomD(value int) {
+	new := &NodeD{
+		value: value,
+	}
+	if Ld.head == nil {
+		Ld.head = new
+	} else {
+		tmp := Ld.head
+		for tmp.next != nil {
+			tmp = tmp.next
+		}
+		tmp.next = new
+		new.prev = tmp
+	}
 }
 
 // RemoveFromTopd removes the node at the top of the list
 func (Ld *ListD) RemoveFromTopd() {
-	Ld.head.next = Ld.head.next.next
-	Ld.head.next.prev = Ld.head
+	if Ld.head == nil {
+		return
+	}
+	tmp := Ld.head
+	if tmp.prev == tmp.next {
+		Ld.head = nil
+	} else {
+		Ld.head = tmp.next
+		tmp.next.prev = Ld.head
+	}
+}
+
+// RemoveFromBottomD removes the node at the end of the list
+func (Ld *ListD) RemoveFromBottomD() {
+	if Ld.head == nil {
+		return
+	}
+	current := Ld.head
+	if current.prev == current.next {
+		Ld.head = nil
+		return
+	}
+	for current.next != nil {
+		current = current.next
+	}
+	current.prev.next = nil
 }
 
 // IterateFromHeadD iterates through the list from the head and prints out each value
 func (Ld *ListD) IterateFromHeadD() {
 	current := Ld.head
-	for current.next != nil {
+	for current != nil {
 		fmt.Printf("%d ", current.value)
 		current = current.next
 	}
